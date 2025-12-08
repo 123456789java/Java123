@@ -1,0 +1,41 @@
+
+# NODE
+
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+
+# FRONTEND (React / Vue / etc.)
+
+frontend/node_modules/
+frontend/build/
+frontend/dist/
+frontend/.cache/
+
+
+# BACKEND
+
+backend/node_modules/
+backend/logs/
+backend/*.log
+
+
+# SYSTEM & EDITOR FILES
+
+.DS_Store
+Thumbs.db
+
+
+# VSCODE
+
+.vscode/
+.history/
+
+
+# OPTIONAL: LOGS
+
+*.log
+logs/
