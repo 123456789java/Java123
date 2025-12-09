@@ -2,10 +2,16 @@ require('dotenv').config();
 const express = require('express');
 const connectDB = require('./config/database');
 
+// Importar función que crea admin por defecto
+const crearAdminPorDefecto = require("./config/createAdmin");
+
 const app = express();
 
 // Conectar a MongoDB Atlas
 connectDB();
+
+// Crear admin por defecto (solo si no existe)
+crearAdminPorDefecto();
 
 // Middleware
 app.use(express.json());
