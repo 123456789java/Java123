@@ -1,15 +1,44 @@
-primeror para hacer la poblacione vas a TERMINAL y pones 
+GUÍA PARA REALIZAR LA POBLACIÓN DE DATOS USANDO POSTMAN
+
+Antes de realizar la población de datos, es obligatorio levantar el servidor desde la terminal.
+
+INICIAR EL SERVIDOR
+
+Primero abre la terminal en la carpeta del proyecto backend y ejecuta:
+
+npm run dev
 
 
-                   npm run dev
+Una vez que el servidor esté corriendo correctamente, recién se podrá realizar la población de datos mediante Postman.
+
+LOGIN COMO ADMIN (PASO OBLIGATORIO)
+
+POST →
+
+http://localhost:3000/api/auth/login
 
 
-resin se podera resalisar la poblacion.
+Body JSON:
 
----------------------------------------------------------------------------
-Crear categoría:
----------------------------------------------------------------------------
+{
+  "correo": "admin@gmail.com",
+  "password": "123456"
+}
+
+
+Después del login, copiar el TOKEN que devuelve la respuesta.
+Este token se debe enviar en todas las peticiones siguientes.
+
+Header obligatorio en Postman:
+
+Authorization: Bearer TU_TOKEN_AQUI
+
+CREAR CATEGORÍA
+
+POST →
+
 http://localhost:3000/api/categorias
+
 
 Body JSON:
 
@@ -17,17 +46,14 @@ Body JSON:
   "nombre": "Matemática"
 }
 
-
-
----------------------------------------------------------------------------
-Crear subcategoría:
----------------------------------------------------------------------------
-
-
+CREAR SUBCATEGORÍA
 
 POST →
 
 http://localhost:3000/api/subcategorias
+
+
+Body JSON:
 
 {
   "nombre": "Álgebra",
@@ -35,36 +61,74 @@ http://localhost:3000/api/subcategorias
 }
 
 
----------------------------------------------------------------------------
-Crear nivel:
----------------------------------------------------------------------------
+Nota:
+El ID_DE_LA_CATEGORIA se obtiene consultando las categorías creadas:
 
+GET http://localhost:3000/api/categorias
 
+CREAR NIVEL DE DIFICULTAD
 
 POST →
 
 http://localhost:3000/api/niveles
+
+
+Body JSON:
 
 {
   "nombre": "Fácil"
 }
 
 
+Se pueden crear más niveles como:
 
+Medio
 
----------------------------------------------------------------------------
-Crear rango de edad:
----------------------------------------------------------------------------
+Difícil
 
-
+CREAR RANGO DE EDAD
 
 POST →
 
 http://localhost:3000/api/rangos
+
+
+Body JSON:
 
 {
   "descripcion": "5-7 años",
   "edadMin": 5,
   "edadMax": 7
 }
----------------------------------------------------------------------------
+
+VERIFICAR DATOS POBLADOS
+
+Para verificar que los datos se guardaron correctamente, usar los siguientes endpoints:
+
+GET http://localhost:3000/api/categorias
+GET http://localhost:3000/api/subcategorias
+GET http://localhost:3000/api/niveles
+GET http://localhost:3000/api/rangos
+
+
+Todos deben enviarse con el Header:
+
+Authorization: Bearer TU_TOKEN
+
+ORDEN CORRECTO DE POBLACIÓN
+
+Iniciar servidor (npm run dev)
+
+Login como admin
+
+Crear categorías
+
+Crear subcategorías
+
+Crear niveles
+
+Crear rangos de edad
+
+CONCLUSIÓN
+
+Siguiendo estos pasos en el orden indicado, la base de datos quedará correctamente poblada, con relaciones válidas y respetando el control de acceso por roles implementado en el sistema.

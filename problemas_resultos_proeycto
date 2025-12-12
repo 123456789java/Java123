@@ -1,0 +1,201 @@
+# Informe de Incidencias y Correcciones del Proyecto Backend
+
+## 1. Introducción
+
+Este informe documenta de forma estructurada todos los problemas técnicos encontrados durante el desarrollo del backend del proyecto, así como las correcciones aplicadas para alcanzar un funcionamiento estable y correcto. El objetivo es dejar evidencia del proceso de depuración, las decisiones técnicas adoptadas y el resultado final.
+
+El proyecto está desarrollado con Node.js, Express, MongoDB, autenticación JWT, control de roles y soporte HTTP/2 mediante SPDY.
+
+---
+
+## 2. Problemas de Autenticación y JWT
+
+### 2.1 Uso incorrecto del middleware `auth`
+
+**Problema:**
+El middleware de autenticación estaba definido como una función que retorna otra función (`auth(roles)`), pero en las rutas se estaba usando directamente como middleware (`auth`) sin invocarlo.
+
+**Error observado:**
+
+```
+TypeError: argument handler must be a function
+```
+
+**Causa:**
+Express esperaba una función middleware, pero recibía un objeto o una referencia incorrecta.
+
+**Solución aplicada:**
+Se corrigió el uso del middleware en las rutas, invocándolo correctamente:
+
+```js
+auth(["admin"])
+```
+
+De esta manera, el middleware recibe los roles permitidos y retorna una función válida para Express.
+
+---
+
+### 2.2 Falta de información en el token JWT
+
+**Problema:**
+Inicialmente el token JWT no contenía el rol del usuario.
+
+**Consecuencia:**
+El control de acceso por roles fallaba, incluso con tokens válidos.
+
+**Solución aplicada:**
+Se modificó el `login` para incluir explícitamente el rol en el payload del JWT:
+
+```js
+jwt.sign({ id: usuario._id, rol: usuario.rol }, JWT_SECRET, { expiresIn: "1h" });
+```
+
+---
+
+## 3. Exposición de contraseñas
+
+### 3.1 Contraseñas visibles en respuestas JSON
+
+**Problema:**
+Las respuestas de la API devolvían el campo `password` del usuario.
+
+**Riesgo:**
+Exposición de información sensible.
+
+**Solución aplicada:**
+Se implementó el método `toJSON` en el modelo `Usuario` para eliminar automáticamente la contraseña en cualquier respuesta:
+
+```js
+UsuarioSchema.methods.toJSON = function () {
+  const usuario = this.toObject();
+  delete usuario.password;
+  return usuario;
+};
+```
+
+---
+
+## 4. Inconsistencia en las rutas de la API
+
+### 4.1 Uso mezclado de rutas con y sin `/api`
+
+**Problema:**
+Algunas rutas estaban registradas bajo `/api`, mientras que otras no.
+
+**Ejemplo:**
+
+* `/api/auth/login`
+* `/usuarios`
+
+**Consecuencia:**
+Confusión en Postman, errores de conexión y llamadas incorrectas a endpoints.
+
+**Solución aplicada:**
+Se reorganizaron todas las rutas para que vivan bajo un prefijo común `/api`:
+
+```js
+app.use('/api/auth', authRoutes);
+app.use('/api/usuarios', usuarioRoutes);
+```
+
+Esto estandarizó el acceso a la API.
+
+---
+
+## 5. Errores por archivos inexistentes
+
+### 5.1 Importación de validadores inexistentes
+
+**Problema:**
+Las rutas de usuarios intentaban importar `../validators/usuario`, archivo que no existía.
+
+**Error observado:**
+
+```
+Cannot find module '../validators/usuario'
+```
+
+**Solución aplicada:**
+Se creó el archivo `src/validators/usuario.js` con validaciones básicas usando `express-validator`, asegurando que las importaciones fueran válidas.
+
+---
+
+## 6. Problemas con HTTP/2 y Postman
+
+### 6.1 Incompatibilidad entre SPDY, HTTPS y Postman
+
+**Problema:**
+El servidor usaba HTTP/2 + HTTPS con certificados autofirmados mediante `spdy`, lo que provocaba errores en Postman.
+
+**Error observado:**
+
+```
+socket hang up
+```
+
+**Causa:**
+Postman no negocia correctamente HTTP/2 con certificados autofirmados usando SPDY.
+
+**Solución aplicada:**
+Se implementó un servidor dual según el entorno:
+
+* Desarrollo: HTTP normal (compatible con Postman)
+* Producción: HTTP/2 + HTTPS (SPDY)
+
+Esto permitió probar la API sin errores y mantener HTTP/2 para el objetivo del proyecto.
+
+---
+
+## 7. Control de acceso por roles
+
+### 7.1 Accesos denegados (403)
+
+**Situación observada:**
+Usuarios con rol `profesor` recibían `403 No autorizado` al acceder a rutas administrativas.
+
+**Análisis:**
+Esto no era un error, sino el comportamiento esperado.
+
+**Resultado:**
+Se confirmó que el control de roles funciona correctamente y que solo usuarios `admin` pueden acceder a endpoints sensibles.
+
+---
+
+## 8. Gestión de Git y commits
+
+### 8.1 Confusión con archivos staged y no staged
+
+**Problema:**
+Algunos archivos estaban preparados para commit y otros no, lo que generó dudas.
+
+**Solución aplicada:**
+Se revisó el estado con `git status`, se agregaron los archivos faltantes y se realizó un commit claro y descriptivo.
+
+**Commit final recomendado:**
+
+```bash
+git commit -m "feat: implementar autenticación JWT, control de roles y gestión de usuarios"
+```
+
+---
+
+## 9. Resultado Final
+
+Después de aplicar todas las correcciones:
+
+* El login funciona correctamente.
+* La autenticación JWT es válida.
+* El control de roles está operativo.
+* Las contraseñas no se exponen.
+* Las rutas están unificadas y claras.
+* HTTP/2 está disponible para producción.
+* El proyecto es estable y defendible académicamente.
+
+---
+
+## 10. Conclusión
+
+El proceso de resolución de errores permitió mejorar significativamente la calidad del backend. Cada problema detectado aportó una oportunidad de aprendizaje y fortaleció la arquitectura final del sistema. El proyecto cumple con los requisitos funcionales y técnicos planteados inicialmente.
+
+Estado final del proyecto: **FUNCIONANDO CORRECTAMENTE**.
+c
