@@ -1,0 +1,108 @@
+INSTRUCCIONES DE INSTALACIÓN Y CONFIGURACIÓN DEL PROYECTO
+--------------------------------------------------------------------------------
+
+1. REQUISITOS PREVIOS
+--------------------
+- Node.js (v18 o superior)
+- npm
+- Cuenta en MongoDB Atlas
+- Git
+- Postman (para pruebas)
+
+---
+
+2. CLONAR EL REPOSITORIO
+--------------------------------------------------------------------------------
+git clone https://github.com/123456789java/Java123.git
+cd backend
+npm install
+
+---
+
+3. CONFIGURACIÓN DE VARIABLES DE ENTORNO
+--------------------------------------------------------------------------------
+
+Crear un archivo llamado `.env` en la raíz del backend con el siguiente contenido:
+
+MONGO_URI=URL_DE_MONGODB_ATLAS
+JWT_SECRET=CLAVE_SECRETA_JWT
+PORT=3000
+NODE_ENV=development
+
+Notas:
+- La URL de MongoDB Atlas se obtiene desde:
+  https://www.mongodb.com/atlas/database
+- JWT_SECRET puede ser cualquier texto seguro.
+
+El archivo `.env` NO debe subirse a GitHub.
+
+---
+
+4. CONFIGURACIÓN DE CERTIFICADOS HTTPS (HTTP/2)
+--------------------------------------------------------------------------------
+
+
+Para ejecutar el servidor en modo producción (HTTP/2), se requieren certificados SSL.
+
+Pasos:
+1. Crear una carpeta llamada `certs/` en la raíz del backend.
+2. Generar los certificados con OpenSSL:
+
+openssl req -x509 -newkey rsa:2048 -nodes -keyout server.key -out server.cert -days 365
+
+3. Colocar los archivos generados en:
+   certs/server.key
+   certs/server.cert
+
+Estos certificados son utilizados en el archivo:
+src/server.js
+
+Los certificados NO deben subirse a GitHub.
+
+---
+
+5. EJECUCIÓN DEL SERVIDOR
+--------------------------------------------------------------------------------
+
+Modo desarrollo (HTTP):
+npm run dev
+
+Modo producción (HTTP/2):
+Configurar NODE_ENV=production en el archivo .env
+npm run dev
+
+---
+
+6. POBLACIÓN DE LA BASE DE DATOS
+--------------------------------------------------------------------------------
+
+
+El proyecto incluye un script para poblar la base de datos con datos de prueba.
+
+Ejecutar:
+npm run seed
+
+Alternativamente, la población puede realizarse manualmente mediante Postman siguiendo la guía incluida en el proyecto.
+
+---
+
+7. PRUEBAS DE FUNCIONAMIENTO
+--------------------------------------------------------------------------------
+
+
+Endpoints principales:
+
+POST   /api/auth/login
+POST   /api/auth/register
+GET    /api/usuarios
+POST   /api/categorias
+POST   /api/subcategorias
+POST   /api/niveles
+POST   /api/rangos
+
+Todas las rutas protegidas requieren JWT en el header Authorization.
+
+---
+
+FIN DEL DOCUMENTO
+--------------------------------------------------------------------------------

@@ -21,8 +21,8 @@ http://localhost:3000/api/auth/login
 Body JSON:
 
 {
-  "correo": "admin@gmail.com",
-  "password": "123456"
+  "correo": "admin_rodolfo@system.com",
+  "password": "admin123"
 }
 
 

@@ -1,264 +1,170 @@
-# 🌐 Proyecto Web — Backend + Frontend  
+🌐 Proyecto Web — Backend + Frontend
 
-Aplicación web desarrollada con **Node.js**, **Express**, **MongoDB Atlas** y un frontend independiente dentro del mismo repositorio.  
-Incluye autenticación, manejo de usuarios, categorías, subcategorías, niveles de dificultad y rangos de edad.
+Aplicación web desarrollada con Node.js, Express, MongoDB Atlas y un frontend independiente dentro del mismo repositorio.
+El backend implementa autenticación con JWT, control de roles, HTTP/2 con HTTPS, población automática de la base de datos (seed) y una guía de instalación segura.
 
----
+📁 Estructura del Proyecto
 
-## 📁 Estructura del Proyecto
-
-```plaintext
 Java123/
 │
-├── backend/                # Servidor Node.js + Express + MongoDB
+├── backend/
+│   ├── certs/                # Certificados HTTPS (NO se suben a GitHub)
+│   ├── node_modules/
 │   ├── src/
-│   │   ├── config/         # Configuración de base de datos (Mongoose)
-│   │   ├── controllers/    # Controladores del sistema
-│   │   ├── middlewares/    # Middlewares (auth, validaciones)
-│   │   ├── models/         # Modelos de Mongoose
-│   │   ├── routes/         # Rutas de la API REST
-│   │   ├── app.js          # Configuración principal de Express
-│   │   └── server.js       # Punto de entrada del servidor (con HTTP/2 y SPDY)
+│   │   ├── config/           # Configuración de base de datos y admin por defecto
+│   │   │   ├── database.js
+│   │   │   └── createAdmin.js
+│   │   ├── controllers/      # Controladores del sistema
+│   │   ├── middlewares/      # Middleware JWT y control de roles
+│   │   ├── models/           # Modelos Mongoose
+│   │   ├── routes/           # Rutas REST
+│   │   ├── seed/             # Script de población de datos
+│   │   │   └── seed.js
+│   │   ├── validators/       # Validaciones de datos
+│   │   ├── app.js            # Configuración principal de Express
+│   │   └── server.js         # Servidor HTTPS + HTTP/2 (SPDY)
+│   │
 │   ├── package.json
 │   ├── package-lock.json
-│   └── .env                # Variables de entorno (obligatorio)
+│   └── .env                  # Variables de entorno (NO se sube)
 │
-├── frontend/               # Carpeta para el futuro frontend
-│   └── index.js
+├── frontend/                 # Frontend independiente (futuro React)
 │
 ├── .gitignore
+├── install.txt               # Guía de instalación y configuración segura
+├── poblacion-ej.txt          # Guía de población manual con Postman
+├── problemas_resultos_proyecto.txt
 └── README.md
 
-🛠️ Tecnologías utilizadas
-Backend
 
-Node.js
+🔐 Certificados HTTPS (HTTP/2)
 
-Express
+Los certificados NO se suben al repositorio.
 
-MongoDB Atlas
+Cada usuario debe generarlos localmente:
 
-Mongoose
-
-dotenv
-
-Nodemon
-
-JSON Web Tokens (JWT)
-
-Frontend
-
-Preparado para React o HTML/CSS/JS
-
-🔧 Instalación del Backend
-
-1️⃣ Entrar en la carpeta backend
-cd backend
-
-2️⃣ Instalar dependencias
-npm install
-
-3️⃣ Instalar Nodemon
-npm install --save-dev nodemon
-
-🔐 Variables de Entorno (OBLIGATORIO)
-
-Crear archivo:
-
-backend/.env
+openssl req -x509 -newkey rsa:2048 -nodes \
+-keyout server.key -out server.cert -days 365
 
 
-Contenido:
+Ubicación obligatoria:
 
-PORT=3000
-MONGODB_URI="mongodb+srv://<usuario>:<password>@<cluster>.mongodb.net/<nombreDB>?retryWrites=true&w=majority"
-JWT_SECRET=claveSuperSegura123
+backend/certs/server.key
+backend/certs/server.cert
 
 
-⚠️ Sin este archivo el servidor NO funcionará.
-⚠️ No subir claves reales en repositorios públicos.
+Estos certificados son utilizados en:
+
+src/server.js
 
 ▶️ Ejecutar el Backend
-Modo desarrollo:
+Modo desarrollo (HTTP/2 + HTTPS)
 npm run dev
 
-Modo producción:
-npm start
 
+Salida esperada:
 
-Si todo funciona correctamente verás:
-
+🔥 Servidor HTTP/2 + HTTPS corriendo en puerto 3000
 🔥 MongoDB conectado correctamente
-Servidor escuchando en el puerto 3000
 
-🧪 Endpoints principales
+🌱 Población Automática de la Base de Datos (SEED)
+
+El proyecto incluye un script obligatorio de población:
+
+src/seed/seed.js
+
+
+Ejecutar:
+
+npm run seed
+
+
+Este script:
+
+Limpia la base de datos
+
+Crea un usuario administrador
+
+Inserta categorías, subcategorías, niveles y rangos de edad
+
+Usa variables de entorno
+
+No contiene credenciales hardcodeadas
+
+🧪 Endpoints Principales
 Autenticación
-POST /api/auth/login
+
 POST /api/auth/register
 
+POST /api/auth/login
+
+Usuarios (solo admin)
+
+GET /api/usuarios
+
 Categorías
+
 GET /api/categorias
+
 POST /api/categorias
 
 Subcategorías
+
 GET /api/subcategorias
+
 POST /api/subcategorias
 
-Niveles de dificultad
+Niveles
+
 GET /api/niveles
 
+POST /api/niveles
+
 Rangos de edad
+
 GET /api/rangos
+
+POST /api/rangos
+
+Las rutas protegidas requieren JWT en el header Authorization: Bearer <token>
+
+🔧 Población Manual con Postman
+
+La población manual está documentada paso a paso en:
+
+poblacion-ej.txt
+
+
+Incluye:
+
+Login
+
+Uso de JWT
+
+Creación de categorías, subcategorías, niveles y rangos
 
 🚀 Frontend
 
-La carpeta /frontend está lista para implementar React o HTML/JS.
+La carpeta /frontend está preparada para React.
 
-Para crear un proyecto React:
+Ejemplo:
 
 cd frontend
 npx create-react-app .
 
-🔍 Notas importantes
+🧠 Notas Importantes
 
-El .env debe estar dentro de backend/.
+El archivo .env es obligatorio
 
-MongoDB Atlas debe permitir tu IP.
+MongoDB Atlas debe permitir tu IP
 
-Ejecuta siempre npm run dev dentro de la carpeta backend.
+No subir certificados ni credenciales a GitHub
 
-Backend y frontend se desarrollan por separado.
+La instalación completa está documentada en install.txt
 
-🔧 Cómo poblar la base de datos usando Postman
-1. Registrar un nuevo usuario (Profesor o Administrador)
-A) Registro de usuario (Administrador o Profesor)
+El script seed.js es obligatorio según la consigna
 
-En Postman, configura el método POST.
+🧑‍🏫 Justificación Técnica (HTTP/2)
 
-La URL será:
-
-https://localhost:3000/api/auth/register
- 
-En Body, selecciona raw → JSON y escribe el siguiente JSON:
-
-Ejemplo de administrador:
-
-{
-  "nombre": "Administrador_rodolfo",
-  "correo": "admin_rodolfo@system.com",
-  "password": "admin123",
-  "rol": "admin"
-}
-
-
-Ejemplo de profesor:
-
-{
-  "nombre": "Juan Perez",
-  "correo": "juanperez@system.com",
-  "password": "profesor123",
-  "rol": "profesor"
-}
-
-
-Haz clic en Send.
-
-Respuesta esperada:
-
-{
-  "mensaje": "Usuario registrado correctamente",
-  "usuario": {
-    "nombre": "Administrador_rodolfo",
-    "correo": "admin_rodolfo@system.com",
-    "rol": "admin",
-    "_id": "62babcaf56c0e47f07adf3a9",
-    "__v": 0
-  }
-}
-
-2. Crear categorías
-
-Configura el método POST en Postman.
-
-La URL será:
-
-https://localhost:3000/api/categorias
-
-
-En Body, selecciona raw → JSON y escribe el siguiente JSON:
-
-{
-  "nombre": "Matemáticas"
-}
-
-
-Haz clic en Send.
-
-3. Crear subcategorías
-
-Configura el método POST en Postman.
-
-La URL será:
-
-https://localhost:3000/api/subcategorias
-
-
-En Body, selecciona raw → JSON y escribe el siguiente JSON:
-
-{
-  "nombre": "Álgebra",
-  "categoriaId": "ID_DE_LA_CATEGORIA"
-}
-
-
-Haz clic en Send.
-
-4. Crear niveles de dificultad
-
-Configura el método POST en Postman.
-
-La URL será:
-
-https://localhost:3000/api/niveles
-
-
-En Body, selecciona raw → JSON y escribe el siguiente JSON:
-
-{
-  "nombre": "Difícil"
-}
-
-
-Haz clic en Send.
-
-5. Crear rangos de edad
-
-Configura el método POST en Postman.
-
-La URL será:
-
-https://localhost:3000/api/rangos
-
-
-En Body, selecciona raw → JSON y escribe el siguiente JSON:
-
-{
-  "descripcion": "5-7 años",
-  "edadMin": 5,
-  "edadMax": 7
-}
-
-
-Haz clic en Send.
-
-🧑‍💻 Tecnologías utilizadas para HTTP/2 en este proyecto
-
-Node.js: Plataforma para JavaScript en el servidor.
-
-Express: Framework para manejar rutas HTTP.
-
-SPDY: Paquete que permite usar HTTP/2 en Express, actuando como un puente entre HTTP/1.1 y HTTP/2.
-
-TLS/SSL (OpenSSL): Protocolo para conexiones seguras, usado para habilitar HTTPS.
-
-SPDY es clave para habilitar HTTP/2, ya que Express no soporta HTTP/2 de manera nativa. Esta tecnología mejora el rendimiento de la comunicación entre el servidor y los clientes.
+Este proyecto implementa HTTP/2 mediante SPDY, ya que Express no soporta HTTP/2 de forma nativa.
+El uso de HTTP/2 mejora el rendimiento de la comunicación cliente-servidor al permitir multiplexación y conexiones persistentes sobre HTTPS.
